@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::io::{Result, Write};
-use std::net::Shutdown::Write;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct HttpResponse<'a> {
@@ -32,7 +31,7 @@ impl <'a> From<HttpResponse<'a>> for String {
             &res1.status_code(),
             &res1.status_text(),
             &res1.headers(),
-            &res1.body.unwrap().len(),
+            &res1.body.as_ref().unwrap().len(),
             &res1.body()
         )
     }
@@ -104,5 +103,77 @@ impl <'a> HttpResponse<'a> {
         }
     }
 
+}
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_response_struct_creation_200() {
+        let response_actual = HttpResponse::new(
+            "200",
+            None,
+            Some("xxxx".into())
+        );
+
+        let response_expected = HttpResponse {
+            version: "HTTP/1.1",
+            status_code: "200",
+            status_text: "OK",
+            headers: {
+                let mut h = HashMap::new();
+                h.insert("Content-Type","text/html");
+                Some(h)
+            },
+            body: Some("xxxx".into())
+        };
+
+        assert_eq!(response_actual, response_expected)
+
+    }
+
+
+    #[test]
+    fn test_response_struct_creation_404() {
+        let response_actual = HttpResponse::new(
+            "404",
+            None,
+            Some("xxxx".into())
+        );
+
+        let response_expected = HttpResponse {
+            version: "HTTP/1.1",
+            status_code: "404",
+            status_text: "Not Found",
+            headers: {
+                let mut h = HashMap::new();
+                h.insert("Content-Type","text/html");
+                Some(h)
+            },
+            body: Some("xxxx".into())
+        };
+
+        assert_eq!(response_actual, response_expected)
+
+    }
+
+    #[test]
+    fn test_http_response_creation() {
+        let response_expected = HttpResponse {
+            version: "HTTP/1.1",
+            status_code: "404",
+            status_text: "Not Found",
+            headers: {
+                let mut h = HashMap::new();
+                h.insert("Content-Type","text/html");
+                Some(h)
+            },
+            body: Some("xxxx".into())
+        };
+
+        let http_string: String = response_expected.into();
+        let actual_string = "HTTP/1.1 404 Not Found\r\nContent-Type:text/html\r\nContent-Length: 4\r\n\r\nxxxx";
+        assert_eq!(http_string, actual_string)
+    }
 }
