@@ -1,10 +1,9 @@
-use core::slice::heapsort;
 use http::{httprequest::HttpRequest, httpresponse::HttpResponse};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::env;
 use std::fs;
-use serde_json::json;
+use serde_json;
 
 
 pub trait Handler {
@@ -47,11 +46,11 @@ impl Handler for StaticPageHandler {
                 Some(contents) => {
                     let mut map: HashMap<&str,&str> = HashMap::new();
                     if path.ends_with(".css") {
-                        map.insert("Content-Type","text/css")
+                        map.insert("Content-Type","text/css");
                     }else if path.ends_with(".js") {
-                        map.insert("Content-Type","text/javascript")
+                        map.insert("Content-Type","text/javascript");
                     }else {
-                        map.insert("Content-Type","text/html")
+                        map.insert("Content-Type","text/html");
                     }
                     HttpResponse::new("200",Some(map),Some(contents))
                 },
