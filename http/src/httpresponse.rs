@@ -41,7 +41,7 @@ impl <'a> HttpResponse<'a> {
     pub fn new(
         status_code: &'a str,
         headers: Option<HashMap<&'a str, &'a str>>,
-        body: Option<String>,
+        body: Option<Result<String>>,
     ) -> HttpResponse<'a> {
         let mut response: HttpResponse<'a> = HttpResponse::default();
         if status_code != "200" {
